@@ -25,7 +25,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         // Start the view's AR session with a configuration that uses the rear camera,
         // device position and orientation tracking, and plane detection.
         let configuration = ARWorldTrackingConfiguration()
-        configuration.planeDetection = [.horizontal, .vertical]
+        configuration.planeDetection = [ .vertical]
         sceneView.session.run(configuration)
 
         // Set a delegate to track the number of plane anchors for providing UI feedback.
@@ -79,17 +79,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
             extentGeometry.height = CGFloat(planeAnchor.extent.z)
             plane.extentNode.simdPosition = planeAnchor.center
         }
-        
-        // Update the plane's classification and the text position
-        if #available(iOS 12.0, *),
-            let classificationNode = plane.classificationNode,
-            let classificationGeometry = classificationNode.geometry as? SCNText {
-            let currentClassification = planeAnchor.classification.description
-            if let oldClassification = classificationGeometry.string as? String, oldClassification != currentClassification {
-                classificationGeometry.string = currentClassification
-                classificationNode.centerAlign()
-            }
-        }
+    
         
     }
 

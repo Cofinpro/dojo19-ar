@@ -7,11 +7,6 @@ Convenience class for visualizing Plane extent and geometry
 
 import ARKit
 
-// Convenience extension for colors defined in asset catalog.
-extension UIColor {
-    static let planeColor = UIColor(named: "planeColor")!
-}
-
 class Plane: SCNNode {
     
     let meshNode: SCNNode
@@ -49,16 +44,14 @@ class Plane: SCNNode {
         addChildNode(meshNode)
         addChildNode(extentNode)
         
-        // Display the plane's classification, if supported on the device
-        if #available(iOS 12.0, *), ARPlaneAnchor.isClassificationSupported {
-            let classification = anchor.classification.description
-            let textNode = self.makeTextNode(classification)
-            classificationNode = textNode
-            // Change the pivot of the text node to its center
-            textNode.centerAlign()
-            // Add the classification node as a child node so that it displays the classification
-            extentNode.addChildNode(textNode)
-        }
+   
+        let textNode = self.makeTextNode("Angular")
+        classificationNode = textNode
+        // Change the pivot of the text node to its center
+        textNode.centerAlign()
+        // Add the classification node as a child node so that it displays the classification
+        extentNode.addChildNode(textNode)
+        
         #endif
     }
     
@@ -68,12 +61,12 @@ class Plane: SCNNode {
     
     private func setupMeshVisualStyle() {
         // Make the plane visualization semitransparent to clearly show real-world placement.
-        meshNode.opacity = 0.25
+        meshNode.opacity = 0.5
         
         // Use color and blend mode to make planes stand out.
         guard let material = meshNode.geometry?.firstMaterial
             else { fatalError("ARSCNPlaneGeometry always has one material") }
-        material.diffuse.contents = UIColor.planeColor
+        material.diffuse.contents = UIImage(named: "angular.png")
     }
     
     private func setupExtentVisualStyle() {
@@ -83,7 +76,7 @@ class Plane: SCNNode {
         guard let material = extentNode.geometry?.firstMaterial
             else { fatalError("SCNPlane always has one material") }
         
-        material.diffuse.contents = UIColor.planeColor
+        material.diffuse.contents = UIColor.init(named: "planeColor")
 
         // Use a SceneKit shader modifier to render only the borders of the plane.
         guard let path = Bundle.main.path(forResource: "wireframe_shader", ofType: "metal", inDirectory: "Assets.scnassets")
@@ -97,6 +90,7 @@ class Plane: SCNNode {
     }
     
     private func makeTextNode(_ text: String) -> SCNNode {
+        
         let textGeometry = SCNText(string: text, extrusionDepth: 1)
         textGeometry.font = UIFont(name: "Futura", size: 75)
 
