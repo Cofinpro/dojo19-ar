@@ -1,0 +1,35 @@
+{
+  "info" : {
+    "version" : 1,
+    "author" : "xcode"
+  },
+  "resources" : [
+    {
+      "filename" : "Angular.arreferenceimage"
+    },
+    {
+      "filename" : "Cofinpro.arreferenceimage"
+    },
+    {
+      "filename" : "D3.arreferenceimage"
+    },
+    {
+      "filename" : "Docker.arreferenceimage"
+    },
+    {
+      "filename" : "Jakarta EE.arreferenceimage"
+    },
+    {
+      "filename" : "Microprofile.arreferenceimage"
+    },
+    {
+      "filename" : "MVC Spec.arreferenceimage"
+    },
+    {
+      "filename" : "Nginx.arreferenceimage"
+    },
+    {
+      "filename" : "React.arreferenceimage"
+    }
+  ]
+}

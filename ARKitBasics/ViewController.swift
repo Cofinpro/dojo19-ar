@@ -8,6 +8,7 @@ Main view controller for the AR experience.
 import UIKit
 import SceneKit
 import ARKit
+import os
 
 class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     // MARK: - IBOutlets
@@ -22,14 +23,23 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
+        guard let referenceImages = ARReferenceImage.referenceImages(inGroupNamed: "AR Reference Images", bundle: nil) else {
+            fatalError("Missing expected asset catalog resources.")
+        }
+        
         // Start the view's AR session with a configuration that uses the rear camera,
         // device position and orientation tracking, and plane detection.
         let configuration = ARWorldTrackingConfiguration()
-        configuration.planeDetection = [ .vertical]
+        configuration.planeDetection = [ ]
+        configuration.detectionImages = referenceImages
+        
         sceneView.session.run(configuration)
 
         // Set a delegate to track the number of plane anchors for providing UI feedback.
         sceneView.session.delegate = self
+        
+        // Show Feature Points
+        sceneView.debugOptions = [ ARSCNDebugOptions.showWorldOrigin , ARSCNDebugOptions.showFeaturePoints ]
         
         // Prevent the screen from being dimmed after a while as users will likely
         // have long periods of interaction without touching the screen or buttons.
@@ -51,14 +61,26 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     /// - Tag: PlaceARContent
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         // Place content only for anchors found by plane detection.
-        guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
-        
-        // Create a custom object to visualize the plane geometry and extent.
-        let plane = Plane(anchor: planeAnchor, in: sceneView)
-        
-        // Add the visualization to the ARKit-managed node so that it tracks
-        // changes in the plane anchor as plane estimation continues.
-        node.addChildNode(plane)
+        if let planeAnchor = anchor as? ARPlaneAnchor {
+            // Create a custom object to visualize the plane geometry and extent.
+            let plane = Plane(anchor: planeAnchor, in: sceneView)
+            
+            // Add the visualization to the ARKit-managed node so that it tracks
+            // changes in the plane anchor as plane estimation continues.
+            node.addChildNode(plane)
+        } else if let imageAnchor = anchor as? ARImageAnchor {
+            os_log("Detected image")
+            
+            let referenceImage = imageAnchor.referenceImage
+            
+            let imageName = SCNText(string: referenceImage.name, extrusionDepth: 1)
+            let textNode = SCNNode(geometry: imageName)
+            textNode.eulerAngles.x = .pi / 2
+            //textNode.eulerAngles.z = .pi
+            textNode.simdScale = float3(repeating: 0.2)
+            node.addChildNode(textNode)
+        }
+       
     }
 
     /// - Tag: UpdateARContent
